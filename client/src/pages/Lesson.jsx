@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../utils/api";
 import LessonRenderer from "../components/LessonRenderer";
 import HinglishExplainer from "../components/HinglishExplainer";
+import LessonPDFExporter from "../components/LessonPDFExporter";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
 
@@ -58,7 +59,10 @@ export default function Lesson() {
         </Link>{" "}
         / {data.moduleTitle}
       </nav>
-      <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">{lesson.title}</h1>
+      <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
+        <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">{lesson.title}</h1>
+        <LessonPDFExporter lesson={lesson} courseTitle={data.courseTitle} moduleTitle={data.moduleTitle} />
+      </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <List title="Objectives" items={lesson.objectives} />
