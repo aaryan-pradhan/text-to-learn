@@ -37,7 +37,7 @@ const as = (user) => ({ Authorization: `Bearer ${user}` });
 test.before(async () => {
   mongo = await MongoMemoryServer.create();
   await mongoose.connect(mongo.getUri());
-  app = createApp({ ai: fakeAI, verify });
+  app = createApp({ ai: fakeAI, verify, search: async (q) => [{ videoId: "abc", title: q }] });
 });
 test.after(async () => {
   await mongoose.disconnect();
@@ -85,4 +85,10 @@ test("deletes a course for its owner only", async () => {
   await request(app).delete(`/api/courses/${course._id}`).set(as("user-2")).expect(404);
   await request(app).delete(`/api/courses/${course._id}`).set(as("user-1")).expect(204);
   await request(app).get(`/api/courses/${course._id}`).set(as("user-1")).expect(404);
+});
+
+test("searches YouTube videos for a query", async () => {
+  await request(app).get("/api/youtube").set(as("user-1")).expect(400);
+  const { body } = await request(app).get("/api/youtube?query=react%20hooks").set(as("user-1")).expect(200);
+  assert.deepEqual(body, [{ videoId: "abc", title: "react hooks" }]);
 });
