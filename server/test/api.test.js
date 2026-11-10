@@ -25,6 +25,7 @@ let mongo, app, aiCalls;
 const fakeAI = {
   generateJSON: async (prompt) => {
     aiCalls++;
+    if (prompt.includes("Hinglish")) return { hinglish: "useState state store karta hai." };
     return prompt.includes("curriculum designer") ? outline : lessonJSON;
   },
 };
@@ -91,4 +92,18 @@ test("searches YouTube videos for a query", async () => {
   await request(app).get("/api/youtube").set(as("user-1")).expect(400);
   const { body } = await request(app).get("/api/youtube?query=react%20hooks").set(as("user-1")).expect(200);
   assert.deepEqual(body, [{ videoId: "abc", title: "react hooks" }]);
+});
+
+test("returns a cached Hinglish explanation for the owner only", async () => {
+  const { body: course } = await request(app).post("/api/courses").set(as("user-1")).send({ topic: "React" });
+  const lessonId = course.modules[0].lessons[0]._id;
+  await request(app).post(`/api/lessons/${lessonId}/hinglish`).set(as("user-1")).expect(409);
+  await request(app).get(`/api/courses/${course._id}/modules/0/lessons/0`).set(as("user-1")).expect(200);
+  await request(app).post(`/api/lessons/${lessonId}/hinglish`).set(as("user-2")).expect(404);
+  aiCalls = 0;
+  for (let i = 0; i < 2; i++) {
+    const { body } = await request(app).post(`/api/lessons/${lessonId}/hinglish`).set(as("user-1")).expect(200);
+    assert.equal(body.hinglish, "useState state store karta hai.");
+  }
+  assert.equal(aiCalls, 1);
 });

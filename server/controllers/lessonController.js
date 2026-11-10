@@ -31,5 +31,21 @@ module.exports = (ai, ownCourse) => {
       const lesson = await enrich(await Lesson.findById(ref._id), course, mod);
       res.json({ courseTitle: course.title, moduleTitle: mod.title, lesson });
     },
+
+    // POST /api/lessons/:id/hinglish — Hinglish explanation of the lesson, cached on the lesson.
+    // The browser speaks it aloud with the Web Speech API (no TTS key needed).
+    async hinglish(req, res) {
+      const lesson = await Lesson.findById(req.params.id).populate({ path: "module", populate: { path: "course", select: "creator" } });
+      if (!lesson || lesson.module?.course?.creator !== req.user.sub) throw httpError(404, "Lesson not found");
+      if (!lesson.isEnriched) throw httpError(409, "Lesson is not generated yet");
+      if (!lesson.hinglish) {
+        const text = lesson.content.filter((b) => b.type === "paragraph").map((b) => b.text).join("\n");
+        const { hinglish } = await ai.generateJSON(prompts.generateHinglishPrompt(text));
+        if (typeof hinglish !== "string" || !hinglish.trim()) throw httpError(502, "Translation failed");
+        lesson.hinglish = hinglish.trim();
+        await lesson.save();
+      }
+      res.json({ hinglish: lesson.hinglish });
+    },
   };
 };
