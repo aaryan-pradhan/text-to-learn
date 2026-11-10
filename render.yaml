@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: text-to-learn
+    runtime: node
+    plan: free
+    buildCommand: cd client && npm ci && npm run build && cd ../server && npm ci --omit=dev
+    startCommand: cd server && npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        value: ai-course-generator-257c5
+      - key: NODE_VERSION
+        value: "22"
