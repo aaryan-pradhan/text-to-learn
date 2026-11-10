@@ -6,6 +6,7 @@ const courseController = require("./controllers/courseController");
 const lessonController = require("./controllers/lessonController");
 const courseRoutes = require("./routes/courses");
 const youtubeRoutes = require("./routes/youtube");
+const lessonRoutes = require("./routes/lessons");
 
 // Dependencies are injectable so tests can swap the AI, auth and search.
 function createApp({ ai = require("./services/ai"), verify, search = require("./services/youtube").searchVideos } = {}) {
@@ -20,6 +21,7 @@ function createApp({ ai = require("./services/ai"), verify, search = require("./
   app.get("/api/health", (req, res) => res.json({ ok: true }));
   app.use("/api/courses", courseRoutes({ auth, courses, lessons }));
   app.use("/api/youtube", youtubeRoutes({ auth, search }));
+  app.use("/api/lessons", lessonRoutes({ auth, lessons }));
 
   app.use(notFound);
   app.use(errorHandler);
