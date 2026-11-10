@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../utils/api";
 import LessonRenderer from "../components/LessonRenderer";
+import HinglishExplainer from "../components/HinglishExplainer";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
 
@@ -63,6 +64,8 @@ export default function Lesson() {
         <List title="Objectives" items={lesson.objectives} />
         <List title="Key topics" items={lesson.keyTopics} />
       </div>
+
+      <HinglishExplainer key={lesson._id} lessonId={lesson._id} />
 
       <LessonRenderer content={lesson.content} />
 
