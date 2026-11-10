@@ -1,6 +1,6 @@
 import { auth } from "../firebase";
 
-export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+export const API_URL = import.meta.env.VITE_API_URL || "";
 
 // fetch wrapper: adds the Firebase ID token (refreshed automatically) and unwraps JSON errors.
 export async function api(path, { method = "GET", body } = {}) {
