@@ -6,6 +6,7 @@ import Sidebar from "./components/Sidebar";
 import LoadingSpinner from "./components/LoadingSpinner";
 import Home from "./pages/Home";
 import Course from "./pages/Course";
+import Lesson from "./pages/Lesson";
 
 // Protected layout: persistent sidebar + the current page in <Outlet />.
 function Layout() {
@@ -45,6 +46,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="courses/:courseId" element={<Course />} />
+        <Route path="courses/:courseId/module/:moduleIndex/lesson/:lessonIndex" element={<Lesson />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
